@@ -1,0 +1,16 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_light_bulb": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "rgbdeco:light_bulb"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_light_bulb"
+    ]
+  ]
+}

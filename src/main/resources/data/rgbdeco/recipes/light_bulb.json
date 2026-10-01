@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "G",
+    "L",
+    "R"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "L": {
+      "item": "minecraft:glass_pane"
+    },
+    "R": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "item": "rgbdeco:light_bulb",
+    "count": 4
+  }
+}

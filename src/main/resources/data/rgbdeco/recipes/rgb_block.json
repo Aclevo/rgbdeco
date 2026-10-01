@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building_blocks",
+  "pattern": [
+    " B ",
+    "BSS",
+    "SBS"
+  ],
+  "key": {
+    "B": {
+      "item": "rgbdeco:rgb_light_bulb"
+    },
+    "S": {
+      "item": "minecraft:stone"
+    }
+  },
+  "result": {
+    "item": "rgbdeco:rgb_block",
+    "count": 1
+  }
+}

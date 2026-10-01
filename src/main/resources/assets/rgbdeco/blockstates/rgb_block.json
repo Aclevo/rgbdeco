@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "rgbdeco:block/rgb_block" }
+  }
+}

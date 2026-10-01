@@ -1,0 +1,16 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_rgb_block": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "rgbdeco:rgb_block"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_rgb_block"
+    ]
+  ]
+}

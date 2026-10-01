@@ -1,0 +1,153 @@
+buildscript {
+    repositories {
+        // Only for the Gradle plugins themselves. Everything the mod compiles against is declared in the
+        // repositories block further down.
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+}
+
+apply plugin: 'org.spongepowered.mixin'
+
+group = mod_group_id
+version = mod_version
+
+base {
+    archivesName = mod_id
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+
+    // Required by ForgeGradle so the IDE serves the resources this project puts in the jar itself rather
+    // than the copy Gradle built. See
+    // https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        server {
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
+        }
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+
+    config "${mod_id}.mixins.json"
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    // ForgeGradle adds the Forge maven and Maven Central on its own. Modrinth is here for the mods below.
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // Colorful Lighting (Sodium/Embeddium Edition) reads the colour a panel throws from
+    // assets/rgbdeco/light/emitters.json rather than from any API, so nothing here is compiled against it
+    // and it only has to be present for the colours to show. Optional in mods.toml, so the mod works the
+    // same with or without it. Its Modrinth slug is colorful-lighting-sodium; its mod id is
+    // colorful_lighting.
+    runtimeOnly fg.deobf("maven.modrinth:colorful-lighting-sodium:${colorful_lighting_version}")
+
+    // Powah supplies the energy. What the RGB blocks talk to is Forge's own energy capability rather than
+    // anything of Powah's, which is the same thing Powah's cables and cells push into, so a cable reaching
+    // a controller or a panel needs no code from this mod on the other end of it.
+    //
+    // It is still declared, and is why the buffers are tuned to the shape of its tiers: the controller
+    // holds what a middle tier Powah energy cell holds, and takes energy at the rate one of its cables
+    // pushes it. Any other mod pushing Forge energy into the same capability works just as well.
+    runtimeOnly fg.deobf("maven.modrinth:powah:${powah_version}")
+
+    // Powah refuses to load without these two, so they have to be here for the dev environment to start
+    // with Powah in it. Neither is touched by this mod and neither is in mods.toml, so a world that runs
+    // Powah has them because Powah asked for them rather than because of anything here.
+    runtimeOnly fg.deobf("maven.modrinth:architectury-api:${architectury_version}")
+    runtimeOnly fg.deobf("maven.modrinth:cloth-config:${cloth_config_version}")
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+// Expands the ${} placeholders in the resources listed below, which is how mods.toml and pack.mcmeta get
+// their version and name from gradle.properties rather than being written twice.
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+                             forge_version       : forge_version, forge_version_range: forge_version_range,
+                             loader_version_range: loader_version_range,
+                             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+                             mod_authors         : mod_authors, mod_description: mod_description,]
+
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes(["Specification-Title"     : mod_id,
+                    "Specification-Vendor"    : mod_authors,
+                    "Specification-Version"   : "1", // We are version 1 of ourselves
+                    "Implementation-Title"    : project.name,
+                    "Implementation-Version"  : project.jar.archiveVersion,
+                    "Implementation-Vendor"   : mod_authors,
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
+    }
+
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

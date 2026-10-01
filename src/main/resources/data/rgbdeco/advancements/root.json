@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "item": "rgbdeco:rgb_block"
+    },
+    "title": {
+      "translate": "advancements.rgbdeco.root.title"
+    },
+    "description": {
+      "translate": "advancements.rgbdeco.root.description"
+    },
+    "frame": "task",
+    "background": "rgbdeco:textures/block/rgb_panel.png",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "has_rgb_block": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "rgbdeco:rgb_block"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

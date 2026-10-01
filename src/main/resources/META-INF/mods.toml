@@ -1,0 +1,53 @@
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+
+# A client on a different version is refused at the connection screen rather than let in to find its
+# panels do nothing. This is the default, but it is the right answer for this mod and the rest of this file
+# depends on the server half being the half that works: the panels, the controller and the patterns they
+# show are all decided on the server, and a client that does not match has nothing useful to contribute.
+displayTest = "MATCH_VERSION"
+
+[[dependencies."${mod_id}"]]
+modId = "forge"
+mandatory = true
+versionRange = "${forge_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+# Colorful Lighting tints the light a panel throws, which is what makes a wall light the room in the
+# color it is showing rather than in white. It is optional and client side: the colors live in
+# assets/rgbdeco/light/emitters.json, which only this mod reads, so without it a panel lights the room
+# white exactly as it always has and nothing else is different.
+[[dependencies."${mod_id}"]]
+modId = "colorful_lighting"
+mandatory = false
+versionRange = "[2.0.0,)"
+ordering = "AFTER"
+side = "CLIENT"
+
+# Powah is where the energy for a controller and its panels comes from. It is optional and installed after
+# this mod because nothing here is written against an API of Powah's: a controller and a panel each hold
+# a Forge energy buffer and take energy into it from any side, which is exactly what a Powah cable pushes
+# into. So any other mod pushing Forge energy into the same capability works just as well, and a world
+# with none of them has controllers that never light anything rather than a mod that fails to load.
+[[dependencies."${mod_id}"]]
+modId = "powah"
+mandatory = false
+versionRange = "[4.0.0,)"
+ordering = "AFTER"
+side = "BOTH"

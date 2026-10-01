@@ -1,0 +1,16 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_rgb_controller": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "rgbdeco:rgb_controller"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_rgb_controller"
+    ]
+  ]
+}
